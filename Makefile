@@ -19,6 +19,6 @@ doc:
 	godoc
 
 run:
-	go run main.go
+	go run *.go
 
 all: clean install tests run
