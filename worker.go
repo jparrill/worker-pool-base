@@ -17,7 +17,7 @@ func New(wcount int) WorkerPool {
 	return WorkerPool{
 		workersCount: wcount,
 		jobs:         make(chan Job, wcount),
-		results:      make(chan Result, wcount),
+		results:      make(chan Result, wcount*10),
 		Done:         make(chan struct{}),
 	}
 }
@@ -55,8 +55,12 @@ func (wp WorkerPool) Run(ctx context.Context) {
 	close(wp.results)
 }
 
-func (wp WorkerPool) Results() <-chan Result {
-	return wp.results
+func (wp WorkerPool) Results() {
+	go func() {
+		for a := range wp.results {
+			fmt.Println(a)
+		}
+	}()
 }
 
 func (wp WorkerPool) GenerateFrom(jobsBulk []Job) {

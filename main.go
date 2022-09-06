@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"runtime"
 	"strconv"
 	"time"
@@ -16,9 +15,8 @@ func main() {
 	defer cancel()
 	xJob := TaskGenerator(ctx)
 	go wp.GenerateFrom(xJob)
+	go wp.Results()
 	wp.Run(ctx)
-	fmt.Println(wp.Results())
-
 }
 
 func TaskGenerator(ctx context.Context) []Job {
