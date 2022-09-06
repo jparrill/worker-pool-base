@@ -15,7 +15,7 @@ func main() {
 	defer cancel()
 	xJob := TaskGenerator(ctx)
 	go wp.GenerateFrom(xJob)
-	go wp.Results()
+	go wp.Results(ctx)
 	wp.Run(ctx)
 }
 
