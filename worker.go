@@ -28,7 +28,7 @@ func worker(ctx context.Context, wg *sync.WaitGroup, jobs <-chan Job, results ch
 		select {
 		case job, ok := <-jobs:
 			if !ok {
-				fmt.Println(job)
+				//				fmt.Println(job)
 				return
 			}
 			results <- job.execute(ctx)
@@ -56,21 +56,20 @@ func (wp WorkerPool) Run(ctx context.Context) {
 	close(wp.results)
 }
 
-func (wp WorkerPool) Results(ctx context.Context) {
-	go func() {
-		for {
-			select {
-			case res, ok := <-wp.results:
-				if !ok {
-					return
-				}
-				fmt.Println(res)
-
-			case <-ctx.Done():
+func (wp WorkerPool) Results(ctx context.Context, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for {
+		select {
+		case res, ok := <-wp.results:
+			if !ok {
 				return
 			}
+			fmt.Println(res)
+
+		case <-ctx.Done():
+			return
 		}
-	}()
+	}
 }
 
 func (wp WorkerPool) GenerateFrom(jobsBulk []Job) {

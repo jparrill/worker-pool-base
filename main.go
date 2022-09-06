@@ -5,18 +5,23 @@ import (
 	"errors"
 	"runtime"
 	"strconv"
+	"sync"
 	"time"
 )
 
 func main() {
 
+	var wg sync.WaitGroup
+
 	wp := New(runtime.NumCPU())
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Millisecond*200)
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Millisecond*20)
 	defer cancel()
 	xJob := TaskGenerator(ctx)
 	go wp.GenerateFrom(xJob)
-	go wp.Results(ctx)
+	wg.Add(1)
+	go wp.Results(ctx, &wg)
 	wp.Run(ctx)
+	wg.Wait()
 }
 
 func TaskGenerator(ctx context.Context) []Job {
@@ -53,6 +58,7 @@ func TaskGenerator(ctx context.Context) []Job {
 		job := Job{
 			Descriptor: jobD,
 			ExecFn:     execFn,
+			Args:       i,
 		}
 
 		xJob = append(xJob, job)
