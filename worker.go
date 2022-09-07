@@ -28,7 +28,6 @@ func worker(ctx context.Context, wg *sync.WaitGroup, jobs <-chan Job, results ch
 		select {
 		case job, ok := <-jobs:
 			if !ok {
-				//				fmt.Println(job)
 				return
 			}
 			results <- job.execute(ctx)

@@ -13,14 +13,25 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	wp := New(runtime.NumCPU())
+	// Context for timeouts
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Millisecond*20)
 	defer cancel()
+
+	// Instanciating WP and tasks
+	wp := New(runtime.NumCPU())
 	xJob := TaskGenerator(ctx)
+
+	// Thread that emptier the xJoib slice and fills the channel wp.jobs
 	go wp.GenerateFrom(xJob)
+
+	// Adding a WG to have control about the results channel
 	wg.Add(1)
 	go wp.Results(ctx, &wg)
+
+	// Initiallizing the WP
 	wp.Run(ctx)
+
+	// Waiting for all the goros to finish
 	wg.Wait()
 }
 
